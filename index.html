@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EngineerIQ – Engineering Quiz Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --white: #FFFFFF;
+    --pink-50: #FFF0F5;
+    --pink-100: #FFE4EC;
+    --pink-200: #FFCADB;
+    --pink-400: #FF8CB0;
+    --pink-600: #E8547A;
+    --purple-50: #F5F0FF;
+    --purple-100: #EDE8FF;
+    --purple-200: #D8B4FE;
+    --purple-400: #A855F7;
+    --purple-600: #7C3AED;
+    --gray-50: #FAFAF9;
+    --gray-100: #F4F3F0;
+    --gray-200: #E8E6E0;
+    --gray-400: #9C9890;
+    --gray-600: #5A5754;
+    --gray-900: #1A1816;
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.06);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+
+  /* ── NAV ── */
+  .nav {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--pink-100);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-brand {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.3rem;
+    background: linear-gradient(135deg, var(--purple-600), var(--pink-600));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 20px; border: none;
+    background: transparent; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--gray-600); transition: all 0.2s;
+  }
+  .nav-tab:hover { background: var(--pink-50); color: var(--pink-600); }
+  .nav-tab.active { background: linear-gradient(135deg, var(--purple-600), var(--pink-600)); color: white; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple-200), var(--pink-200));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; color: var(--purple-600);
+    border: 2px solid var(--purple-200); cursor: pointer;
+  }
+  .btn { padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 13px; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--purple-600), var(--pink-600)); color: white; box-shadow: 0 4px 12px rgba(168,85,247,0.3); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(168,85,247,0.4); }
+  .btn-outline { background: white; color: var(--purple-600); border: 1.5px solid var(--purple-200); }
+  .btn-outline:hover { background: var(--purple-50); }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── LANDING ── */
+  .hero {
+    padding: 80px 2rem 60px;
+    text-align: center;
+    background: radial-gradient(ellipse at 60% 0%, #F5F0FF 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, #FFF0F5 0%, transparent 50%),
+                white;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(216,180,254,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple-50); border: 1px solid var(--purple-200);
+    padding: 5px 14px; border-radius: 20px; font-size: 12px;
+    font-weight: 500; color: var(--purple-600); margin-bottom: 20px;
+  }
+  .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-400); display: inline-block; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+  .hero h1 span { background: linear-gradient(135deg, var(--purple-600), var(--pink-600)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-sub { font-size: 1.1rem; color: var(--gray-600); max-width: 560px; margin: 0 auto 36px; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 16px; padding: 48px 2rem; max-width: 1100px; margin: 0 auto;
+  }
+  .feature-card {
+    background: white; border-radius: var(--radius-lg);
+    padding: 24px; box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100); transition: all 0.25s;
+    text-align: center;
+  }
+  .feature-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--purple-200); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px; font-size: 22px;
+  }
+  .feature-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .feature-card p { font-size: 12px; color: var(--gray-600); line-height: 1.5; }
+  .stats-bar {
+    background: linear-gradient(135deg, var(--purple-600) 0%, var(--pink-600) 100%);
+    padding: 32px 2rem;
+    display: flex; justify-content: center; gap: 64px; flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; color: white; }
+  .stat-item .num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; }
+  .stat-item .lbl { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+  /* ── DASHBOARD ── */
+  .dash-layout { display: flex; min-height: calc(100vh - 60px); }
+  .sidebar {
+    width: 220px; min-height: calc(100vh - 60px);
+    background: white; border-right: 1px solid var(--gray-100);
+    padding: 20px 12px; flex-shrink: 0; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+  }
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-400); padding: 0 8px; margin-bottom: 6px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 13px; font-weight: 500; color: var(--gray-600);
+    transition: all 0.15s;
+  }
+  .sidebar-item:hover { background: var(--pink-50); color: var(--pink-600); }
+  .sidebar-item.active { background: linear-gradient(135deg, var(--purple-50), var(--pink-50)); color: var(--purple-600); }
+  .sidebar-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .dash-main { flex: 1; padding: 28px; overflow-y: auto; }
+  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  .dash-header h2 { font-size: 1.5rem; font-weight: 700; }
+  .welcome-card {
+    background: linear-gradient(135deg, var(--purple-600) 0%, var(--pink-600) 100%);
+    border-radius: var(--radius-xl); padding: 28px 32px;
+    color: white; margin-bottom: 24px; position: relative; overflow: hidden;
+  }
+  .welcome-card::after {
+    content: '⚡'; position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+    font-size: 5rem; opacity: 0.12;
+  }
+  .welcome-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+  .welcome-card p { opacity: 0.85; font-size: 13px; margin-bottom: 20px; }
+  .welcome-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .ws { text-align: center; }
+  .ws .val { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; }
+  .ws .lbl { font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.06em; }
+  .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 14px; margin-bottom: 28px; }
+  .metric-card {
+    background: white; border-radius: var(--radius-lg); padding: 18px 20px;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  }
+  .metric-card .m-label { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .metric-card .m-val { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
+  .metric-card .m-sub { font-size: 11px; color: var(--success); margin-top: 4px; }
+  .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+  .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; margin-bottom: 28px; }
+  .cat-card {
+    background: white; border-radius: var(--radius-lg); padding: 18px;
+    border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); cursor: pointer;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .cat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--purple-200); }
+  .cat-card-icon { font-size: 2rem; margin-bottom: 10px; }
+  .cat-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .cat-card .cat-meta { font-size: 11px; color: var(--gray-400); margin-bottom: 10px; }
+  .progress-bar { background: var(--gray-100); border-radius: 4px; height: 5px; margin-bottom: 10px; }
+  .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--purple-400), var(--pink-400)); }
+  .cat-diff { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .diff-medium { background: #FEF3C7; color: #92400E; }
+  .diff-hard { background: #FEE2E2; color: #991B1B; }
+  .start-quiz-btn {
+    width: 100%; padding: 7px; border-radius: 8px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--purple-600), var(--pink-600));
+    color: white; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+    margin-top: 10px; transition: all 0.2s;
+  }
+  .start-quiz-btn:hover { opacity: 0.9; }
+
+  /* ── QUIZ ── */
+  .quiz-container { max-width: 780px; margin: 0 auto; padding: 28px; }
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+  .quiz-progress-info { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+  .quiz-progress-bar { background: var(--gray-100); border-radius: 4px; height: 6px; margin-bottom: 28px; }
+  .quiz-progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--purple-400), var(--pink-400)); transition: width 0.4s; }
+  .timer-box {
+    background: var(--pink-50); border: 1.5px solid var(--pink-200);
+    border-radius: var(--radius-md); padding: 8px 18px;
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: var(--pink-600); display: flex; align-items: center; gap: 8px;
+  }
+  .timer-box.warning { background: #FEF3C7; border-color: #FCD34D; color: #92400E; }
+  .timer-box.danger { background: #FEE2E2; border-color: #FCA5A5; color: #991B1B; animation: blink 0.8s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .question-card {
+    background: white; border-radius: var(--radius-xl); padding: 32px;
+    box-shadow: var(--shadow-md); border: 1px solid var(--gray-100); margin-bottom: 20px;
+  }
+  .q-type-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+  .qtype-mcq { background: var(--purple-50); color: var(--purple-600); }
+  .qtype-code { background: #ECFDF5; color: #065F46; }
+  .qtype-debug { background: #FFF7ED; color: #92400E; }
+  .question-text { font-size: 1.05rem; font-weight: 500; line-height: 1.6; margin-bottom: 24px; }
+  .code-block {
+    background: #1E1B2E; border-radius: var(--radius-md); padding: 16px 20px;
+    font-family: 'Courier New', monospace; font-size: 13px; color: #E2D9F3;
+    margin-bottom: 24px; line-height: 1.6;
+  }
+  .code-keyword { color: #C678DD; }
+  .code-string { color: #98C379; }
+  .code-number { color: #D19A66; }
+  .code-comment { color: #5C6370; font-style: italic; }
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    padding: 14px 18px; border-radius: var(--radius-md); border: 1.5px solid var(--gray-200);
+    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px;
+    font-size: 14px; font-weight: 400;
+  }
+  .option:hover { border-color: var(--purple-400); background: var(--purple-50); }
+  .option.selected { border-color: var(--purple-600); background: var(--purple-50); color: var(--purple-600); font-weight: 500; }
+  .option.correct { border-color: var(--success); background: #F0FDF4; color: #166534; }
+  .option.wrong { border-color: var(--danger); background: #FEF2F2; color: #991B1B; }
+  .option-letter {
+    width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--gray-300);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .option.selected .option-letter { border-color: var(--purple-600); background: var(--purple-600); color: white; }
+  .quiz-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  .quiz-action-btns { display: flex; gap: 10px; }
+  .btn-skip { padding: 10px 20px; border-radius: var(--radius-md); border: 1.5px solid var(--gray-200); background: white; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--gray-600); }
+  .btn-next { padding: 10px 28px; border-radius: var(--radius-md); border: none; background: linear-gradient(135deg, var(--purple-600), var(--pink-600)); color: white; cursor: pointer; font-size: 13px; font-weight: 600; }
+
+  /* ── RESULTS ── */
+  .results-container { max-width: 860px; margin: 0 auto; padding: 28px; }
+  .result-hero {
+    background: linear-gradient(135deg, var(--purple-600) 0%, var(--pink-600) 100%);
+    border-radius: var(--radius-xl); padding: 40px; text-align: center; color: white; margin-bottom: 24px;
+  }
+  .score-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.35);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    background: rgba(255,255,255,0.15);
+  }
+  .score-circle .sc-num { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; }
+  .score-circle .sc-den { font-size: 12px; opacity: 0.8; }
+  .result-hero h2 { font-size: 1.8rem; margin-bottom: 6px; }
+  .result-hero p { opacity: 0.85; font-size: 14px; }
+  .result-stats { display: flex; justify-content: center; gap: 40px; margin-top: 24px; }
+  .rs { text-align: center; }
+  .rs .val { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
+  .rs .lbl { font-size: 11px; opacity: 0.8; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .chart-card { background: white; border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); }
+  .chart-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .analysis-card { background: white; border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); }
+  .analysis-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .skill-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; margin: 3px;
+  }
+  .tag-strong { background: #ECFDF5; color: #065F46; }
+  .tag-weak { background: #FEF2F2; color: #991B1B; }
+  .career-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .career-card {
+    background: white; border-radius: var(--radius-lg); padding: 18px;
+    border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm); text-align: center;
+  }
+  .career-card .role { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .career-card .match { font-size: 12px; color: var(--purple-600); font-weight: 600; }
+  .cert-banner {
+    background: linear-gradient(135deg, #FFFBEB, #FFF0F5);
+    border: 1.5px dashed var(--pink-400); border-radius: var(--radius-xl);
+    padding: 28px; text-align: center; margin-bottom: 24px;
+  }
+  .cert-banner h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .cert-banner p { font-size: 13px; color: var(--gray-600); margin-bottom: 16px; }
+
+  /* ── ANALYTICS ── */
+  .analytics-container { padding: 28px; max-width: 1000px; }
+  .an-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 28px; }
+  .an-card { background: white; border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); }
+  .an-card .an-label { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .an-card .an-val { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin: 4px 0; }
+  .an-card .an-change { font-size: 12px; color: var(--success); font-weight: 500; }
+  .charts-2col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+  /* ── LEADERBOARD ── */
+  .lb-container { padding: 28px; max-width: 800px; }
+  .lb-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--gray-100); padding: 4px; border-radius: 12px; width: fit-content; }
+  .lb-tab { padding: 6px 18px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--gray-600); transition: all 0.15s; }
+  .lb-tab.active { background: white; color: var(--purple-600); box-shadow: var(--shadow-sm); }
+  .lb-podium { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin-bottom: 28px; }
+  .podium-item { text-align: center; }
+  .podium-avatar {
+    width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px; border: 3px solid;
+  }
+  .p1 .podium-avatar { border-color: #F59E0B; background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; width: 62px; height: 62px; font-size: 22px; }
+  .p2 .podium-avatar { border-color: #9CA3AF; background: #F9FAFB; color: #374151; }
+  .p3 .podium-avatar { border-color: #D97706; background: #FFF7ED; color: #92400E; }
+  .podium-rank { font-size: 22px; margin-bottom: 4px; }
+  .podium-name { font-size: 12px; font-weight: 600; }
+  .podium-xp { font-size: 11px; color: var(--gray-400); }
+  .lb-list { background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); overflow: hidden; }
+  .lb-row { display: flex; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--gray-100); gap: 14px; }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row.me { background: linear-gradient(135deg, var(--purple-50), var(--pink-50)); }
+  .lb-rank { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; width: 28px; color: var(--gray-400); }
+  .lb-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; background: var(--purple-50); color: var(--purple-600); }
+  .lb-info { flex: 1; }
+  .lb-info .name { font-size: 13px; font-weight: 600; }
+  .lb-info .college { font-size: 11px; color: var(--gray-400); }
+  .lb-xp { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--purple-600); }
+  .lb-badge { font-size: 16px; }
+
+  /* ── AUTH PAGES ── */
+  .auth-page {
+    min-height: calc(100vh - 60px);
+    display: flex; align-items: stretch;
+  }
+  .auth-left {
+    flex: 1; background: linear-gradient(145deg, var(--purple-600) 0%, #B744D6 50%, var(--pink-600) 100%);
+    padding: 60px 48px; display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .auth-left::before {
+    content: '';
+    position: absolute; top: -100px; right: -100px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: rgba(255,255,255,0.07); pointer-events: none;
+  }
+  .auth-left::after {
+    content: '';
+    position: absolute; bottom: -80px; left: -60px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); pointer-events: none;
+  }
+  .auth-left-brand { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 12px; }
+  .auth-left p { color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.7; margin-bottom: 40px; max-width: 320px; }
+  .auth-perks { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .auth-perks li { color: rgba(255,255,255,0.9); font-size: 13px; display: flex; align-items: center; gap: 10px; }
+  .auth-perks li span { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .auth-testimonial {
+    margin-top: 48px; background: rgba(255,255,255,0.12); border-radius: var(--radius-lg);
+    padding: 20px 24px; border: 1px solid rgba(255,255,255,0.2);
+  }
+  .auth-testimonial p { color: rgba(255,255,255,0.92); font-size: 13px; font-style: italic; margin-bottom: 12px; }
+  .auth-testimonial .t-author { display: flex; align-items: center; gap: 10px; }
+  .auth-testimonial .t-av { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+  .auth-testimonial .t-name { font-size: 12px; font-weight: 600; color: white; }
+  .auth-testimonial .t-role { font-size: 11px; color: rgba(255,255,255,0.65); }
+  .auth-right {
+    width: 480px; flex-shrink: 0; background: white;
+    display: flex; align-items: center; justify-content: center; padding: 40px 48px;
+  }
+  .auth-form-wrap { width: 100%; max-width: 380px; }
+  .auth-form-wrap h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+  .auth-form-wrap .auth-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 28px; }
+  .auth-form-wrap .auth-sub a { color: var(--purple-600); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .auth-form-wrap .auth-sub a:hover { text-decoration: underline; }
+  .social-btns { display: flex; gap: 10px; margin-bottom: 24px; }
+  .social-btn {
+    flex: 1; padding: 10px; border-radius: var(--radius-md); border: 1.5px solid var(--gray-200);
+    background: white; cursor: pointer; font-size: 13px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: all 0.15s; color: var(--gray-900);
+  }
+  .social-btn:hover { border-color: var(--purple-400); background: var(--purple-50); }
+  .auth-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+  .auth-divider span { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 11px 14px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--gray-200); background: var(--gray-50);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-900);
+    transition: all 0.15s; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--purple-400); background: white; box-shadow: 0 0 0 3px rgba(168,85,247,0.1); }
+  .form-group input::placeholder { color: var(--gray-400); }
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap input { padding-left: 40px; }
+  .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+  .pass-toggle { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; color: var(--gray-400); }
+  .form-footer { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .remember-me { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray-600); cursor: pointer; }
+  .remember-me input { width: 15px; height: 15px; accent-color: var(--purple-600); }
+  .forgot-link { font-size: 13px; color: var(--purple-600); font-weight: 500; cursor: pointer; text-decoration: none; }
+  .forgot-link:hover { text-decoration: underline; }
+  .btn-auth {
+    width: 100%; padding: 13px; border-radius: var(--radius-md); border: none;
+    background: linear-gradient(135deg, var(--purple-600), var(--pink-600));
+    color: white; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+  }
+  .btn-auth:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.4); }
+  .btn-auth:active { transform: translateY(0); }
+  .auth-terms { font-size: 11px; color: var(--gray-400); text-align: center; line-height: 1.6; }
+  .auth-terms a { color: var(--purple-600); cursor: pointer; }
+  .strength-bar { height: 4px; border-radius: 2px; background: var(--gray-100); margin-top: 6px; overflow: hidden; }
+  .strength-fill { height: 100%; border-radius: 2px; transition: all 0.3s; }
+  .strength-text { font-size: 11px; margin-top: 4px; }
+  .step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+  .step { display: flex; align-items: center; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 2px solid var(--gray-200); color: var(--gray-400); background: white; transition: all 0.2s; }
+  .step-dot.done { background: var(--success); border-color: var(--success); color: white; }
+  .step-dot.active { background: linear-gradient(135deg, var(--purple-600), var(--pink-600)); border-color: var(--purple-600); color: white; }
+  .step-line { flex: 1; height: 2px; background: var(--gray-100); min-width: 30px; }
+  .step-line.done { background: var(--success); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .auth-left { display: none; }
+    .auth-right { width: 100%; padding: 32px 24px; }
+  }
+    .charts-grid { grid-template-columns: 1fr; }
+    .analysis-grid { grid-template-columns: 1fr; }
+    .charts-2col { grid-template-columns: 1fr; }
+    .an-grid { grid-template-columns: repeat(2,1fr); }
+    .sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">EngineerIQ</div>
+  <div class="nav-tabs" id="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('landing')">Home</button>
+    <button class="nav-tab" onclick="showPage('login')">Login</button>
+    <button class="nav-tab" onclick="showPage('signup')">Sign Up</button>
+    <button class="nav-tab" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('quiz')">Quiz</button>
+    <button class="nav-tab" onclick="showPage('results')">Results</button>
+    <button class="nav-tab" onclick="showPage('analytics')">Analytics</button>
+    <button class="nav-tab" onclick="showPage('leaderboard')">Leaderboard</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" onclick="showPage('login')">Log In</button>
+    <button class="btn btn-primary" style="font-size:12px; padding:6px 14px;" onclick="showPage('signup')">Sign Up</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════ LANDING ═══════════════════ -->
+<div id="page-landing" class="page active">
+  <div class="hero">
+    <div class="hero-badge"><span></span> Now with AI Skill Analysis</div>
+    <h1>Ace Every<br><span>Engineering Interview</span></h1>
+    <p class="hero-sub">17 subjects · 1700+ questions · AI-powered analysis · Real-time leaderboards for engineering students.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="showPage('signup')" style="padding:12px 28px; font-size:15px;">Start for Free →</button>
+      <button class="btn btn-outline" onclick="showPage('quiz')" style="padding:12px 28px; font-size:15px;">Try a Quiz</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="num">50K+</div><div class="lbl">Active Students</div></div>
+    <div class="stat-item"><div class="num">1700+</div><div class="lbl">Questions</div></div>
+    <div class="stat-item"><div class="num">17</div><div class="lbl">Subjects</div></div>
+    <div class="stat-item"><div class="num">94%</div><div class="lbl">Placement Rate</div></div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:var(--purple-50);">🧠</div>
+      <h4>AI Skill Analysis</h4>
+      <p>Personalized weak-area detection and smart recommendations after every quiz.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:var(--pink-50);">🏆</div>
+      <h4>Live Leaderboards</h4>
+      <p>Compete globally, by college, or with friends in real-time ranking battles.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#ECFDF5;">📜</div>
+      <h4>PDF Certificates</h4>
+      <p>Earn verifiable certificates with QR codes for scores above 70%.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FFF7ED;">⚡</div>
+      <h4>5 Question Types</h4>
+      <p>MCQ, multi-select, code output, debugging, and scenario-based questions.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:var(--purple-50);">🎯</div>
+      <h4>Career Guidance</h4>
+      <p>AI maps your strengths to real job roles with match percentages.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:var(--pink-50);">🔒</div>
+      <h4>AI Proctoring</h4>
+      <p>Tab-switch detection, full-screen mode, and anti-cheating monitoring.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<div id="page-login" class="page">
+  <div class="auth-page">
+    <div class="auth-left">
+      <div class="auth-left-brand">⚡ EngineerIQ</div>
+      <p>The AI-powered platform that helps 50,000+ engineering students crack placements and technical interviews.</p>
+      <ul class="auth-perks">
+        <li><span>🧠</span> AI Skill Analysis after every quiz</li>
+        <li><span>🏆</span> Global & college leaderboards</li>
+        <li><span>📜</span> Verifiable PDF certificates</li>
+        <li><span>💼</span> Career role matching with % scores</li>
+        <li><span>🔥</span> Daily streaks & XP gamification</li>
+      </ul>
+      <div class="auth-testimonial">
+        <p>"Went from zero confidence to a Google offer in 3 months — EngineerIQ's AI analysis showed me exactly what to fix."</p>
+        <div class="t-author">
+          <div class="t-av">PK</div>
+          <div><div class="t-name">Priya Kulkarni</div><div class="t-role">SWE @ Google · VIT Vellore '24</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-form-wrap">
+        <h2>Welcome back 👋</h2>
+        <p class="auth-sub">New here? <a onclick="showPage('signup')">Create a free account</a></p>
+
+        <div class="social-btns">
+          <button class="social-btn" onclick="socialLogin('Google')">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Google
+          </button>
+          <button class="social-btn" onclick="socialLogin('GitHub')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHub
+          </button>
+        </div>
+
+        <div class="auth-divider"><span>or sign in with email</span></div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="login-email" placeholder="you@college.edu"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-pass" placeholder="Enter your password"/>
+            <span class="pass-toggle" onclick="togglePass('login-pass', this)">👁</span>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <label class="remember-me"><input type="checkbox"/> Remember me</label>
+          <a class="forgot-link" href="#">Forgot password?</a>
+        </div>
+
+        <button class="btn-auth" onclick="doLogin()">Sign In →</button>
+        <p id="login-error" style="color:var(--danger); font-size:12px; text-align:center; margin-bottom:12px; display:none;"></p>
+        <p class="auth-terms">By signing in you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SIGNUP ═══════════════════ -->
+<div id="page-signup" class="page">
+  <div class="auth-page">
+    <div class="auth-left">
+      <div class="auth-left-brand">⚡ EngineerIQ</div>
+      <p>Join 50,000+ engineering students preparing for their dream placements with AI-powered quizzes.</p>
+      <ul class="auth-perks">
+        <li><span>🆓</span> 100% Free to get started</li>
+        <li><span>📚</span> 1700+ curated questions across 17 subjects</li>
+        <li><span>🤖</span> AI career guidance & job role matching</li>
+        <li><span>🏅</span> Earn badges, XP, and certificates</li>
+        <li><span>📱</span> Practice anywhere, anytime</li>
+      </ul>
+      <div class="auth-testimonial">
+        <p>"The AI weak-area detection helped me improve my DSA score from 40% to 91% in just 6 weeks!"</p>
+        <div class="t-author">
+          <div class="t-av">RS</div>
+          <div><div class="t-name">Rahul Sharma</div><div class="t-role">SDE @ Amazon · NIT Trichy '24</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-right" style="overflow-y:auto; max-height:calc(100vh - 60px);">
+      <div class="auth-form-wrap">
+        <h2>Create your account ✨</h2>
+        <p class="auth-sub">Already have one? <a onclick="showPage('login')">Sign in instead</a></p>
+
+        <!-- Step indicator -->
+        <div class="step-indicator">
+          <div class="step"><div class="step-dot active" id="step-dot-1">1</div></div>
+          <div class="step-line" id="step-line-1"></div>
+          <div class="step"><div class="step-dot" id="step-dot-2">2</div></div>
+          <div class="step-line" id="step-line-2"></div>
+          <div class="step"><div class="step-dot" id="step-dot-3">3</div></div>
+        </div>
+
+        <!-- Step 1: Basic Info -->
+        <div id="signup-step-1">
+          <div class="social-btns">
+            <button class="social-btn" onclick="socialLogin('Google')">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Google
+            </button>
+            <button class="social-btn" onclick="socialLogin('GitHub')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              GitHub
+            </button>
+          </div>
+          <div class="auth-divider"><span>or fill in your details</span></div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="su-name" placeholder="Aditya Raj"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="su-email" placeholder="you@college.edu"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="su-pass" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+              <span class="pass-toggle" onclick="togglePass('su-pass', this)">👁</span>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-text" id="strength-text" style="color:var(--gray-400);"></div>
+          </div>
+          <p id="step1-error" style="color:var(--danger); font-size:12px; margin-bottom:8px; display:none;"></p>
+          <button class="btn-auth" onclick="goStep(2)">Continue →</button>
+        </div>
+
+        <!-- Step 2: Academic Info -->
+        <div id="signup-step-2" style="display:none;">
+          <div class="form-group">
+            <label>College / University</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🏫</span>
+              <input type="text" id="su-college" placeholder="e.g. VIT Vellore"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Branch</label>
+              <select id="su-branch">
+                <option value="">Select branch</option>
+                <option>Computer Science</option>
+                <option>Information Technology</option>
+                <option>Electronics & Comm.</option>
+                <option>Mechanical Engg.</option>
+                <option>Electrical Engg.</option>
+                <option>Civil Engg.</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Graduation Year</label>
+              <select id="su-year">
+                <option value="">Select year</option>
+                <option>2024</option><option>2025</option><option>2026</option><option>2027</option><option>2028</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Current Skill Level</label>
+            <select id="su-level">
+              <option value="">Select level</option>
+              <option>Beginner – Just getting started</option>
+              <option>Intermediate – Know the basics</option>
+              <option>Advanced – Competitive coder</option>
+              <option>Expert – Interview-ready</option>
+            </select>
+          </div>
+          <p id="step2-error" style="color:var(--danger); font-size:12px; margin-bottom:8px; display:none;"></p>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-auth" style="background:white; color:var(--gray-900); border:1.5px solid var(--gray-200); box-shadow:none; flex:0 0 auto; width:80px;" onclick="goStep(1)">← Back</button>
+            <button class="btn-auth" style="flex:1;" onclick="goStep(3)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Preferences -->
+        <div id="signup-step-3" style="display:none;">
+          <p style="font-size:13px; color:var(--gray-600); margin-bottom:16px;">Pick your top subjects to personalize your quiz feed:</p>
+          <div id="subject-picker" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
+          <div class="form-group" style="margin-top:8px;">
+            <label>How did you hear about us?</label>
+            <select>
+              <option>College friend / peer</option>
+              <option>LinkedIn</option>
+              <option>Instagram / YouTube</option>
+              <option>Google search</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:4px;">
+            <button class="btn-auth" style="background:white; color:var(--gray-900); border:1.5px solid var(--gray-200); box-shadow:none; flex:0 0 auto; width:80px;" onclick="goStep(2)">← Back</button>
+            <button class="btn-auth" style="flex:1;" onclick="doSignup()">Create Account 🎉</button>
+          </div>
+          <p class="auth-terms" style="margin-top:14px;">By signing up you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+<div id="page-dashboard" class="page">
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <div class="sidebar-item active"><span class="icon">🏠</span> Dashboard</div>
+        <div class="sidebar-item" onclick="showPage('quiz')"><span class="icon">🧩</span> Take Quiz</div>
+        <div class="sidebar-item" onclick="showPage('results')"><span class="icon">📊</span> My Results</div>
+        <div class="sidebar-item" onclick="showPage('analytics')"><span class="icon">📈</span> Analytics</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Community</div>
+        <div class="sidebar-item" onclick="showPage('leaderboard')"><span class="icon">🏆</span> Leaderboard</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Forum</div>
+        <div class="sidebar-item"><span class="icon">⚔️</span> Quiz Battles</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Premium</div>
+        <div class="sidebar-item"><span class="icon">🤖</span> AI Simulator</div>
+        <div class="sidebar-item"><span class="icon">📝</span> Resume AI</div>
+        <div class="sidebar-item"><span class="icon">🏢</span> Company Sets</div>
+      </div>
+    </div>
+
+    <div class="dash-main">
+      <div class="welcome-card">
+        <h3>Welcome back, Aditya! 👋</h3>
+        <p>You're on a 7-day streak. Keep it up!</p>
+        <div class="welcome-stats">
+          <div class="ws"><div class="val">342</div><div class="lbl">XP Points</div></div>
+          <div class="ws"><div class="val">#47</div><div class="lbl">Global Rank</div></div>
+          <div class="ws"><div class="val">78%</div><div class="lbl">Accuracy</div></div>
+          <div class="ws"><div class="val">7🔥</div><div class="lbl">Streak</div></div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="m-label">Quizzes Taken</div>
+          <div class="m-val">23</div>
+          <div class="m-sub">↑ +3 this week</div>
+        </div>
+        <div class="metric-card">
+          <div class="m-label">Avg Score</div>
+          <div class="m-val">11.2</div>
+          <div class="m-sub">↑ +1.4 this week</div>
+        </div>
+        <div class="metric-card">
+          <div class="m-label">Badges Earned</div>
+          <div class="m-val">8 🏅</div>
+          <div class="m-sub">2 new this month</div>
+        </div>
+        <div class="metric-card">
+          <div class="m-label">Best Category</div>
+          <div class="m-val" style="font-size:1.1rem;">Python 🐍</div>
+          <div class="m-sub">92% accuracy</div>
+        </div>
+      </div>
+
+      <div class="section-title">📚 Subject Categories</div>
+      <div class="categories-grid" id="categories-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ QUIZ ═══════════════════ -->
+<div id="page-quiz" class="page">
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div>
+        <div style="font-size:12px; color:var(--gray-400); margin-bottom:2px;">Data Structures & Algorithms</div>
+        <div class="quiz-progress-info">Question <span id="q-num">4</span> of 15</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button style="background:none; border:1.5px solid var(--gray-200); padding:6px 12px; border-radius:8px; cursor:pointer; font-size:13px;" title="Bookmark">🔖 Bookmark</button>
+        <div class="timer-box" id="timer-box">⏱ <span id="timer">01:42</span></div>
+      </div>
+    </div>
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="quiz-prog" style="width: 26.6%"></div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <!-- Question injected by JS -->
+    </div>
+
+    <div class="quiz-actions">
+      <div style="font-size:12px; color:var(--gray-400);">
+        Answered: <span id="answered-count" style="color:var(--purple-600); font-weight:600;">3</span> / 15
+      </div>
+      <div class="quiz-action-btns">
+        <button class="btn-skip" onclick="nextQuestion()">Skip →</button>
+        <button class="btn-next" onclick="submitAnswer()">Submit & Next ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ RESULTS ═══════════════════ -->
+<div id="page-results" class="page">
+  <div class="results-container">
+    <div class="result-hero">
+      <div class="score-circle">
+        <div class="sc-num">12</div>
+        <div class="sc-den">out of 15</div>
+      </div>
+      <h2>🎉 Excellent Performance!</h2>
+      <p>You outperformed 87% of students who took this quiz today.</p>
+      <div class="result-stats">
+        <div class="rs"><div class="val">80%</div><div class="lbl">Accuracy</div></div>
+        <div class="rs"><div class="val">18:32</div><div class="lbl">Time Taken</div></div>
+        <div class="rs"><div class="val">#23</div><div class="lbl">Today's Rank</div></div>
+        <div class="rs"><div class="val">+48 XP</div><div class="lbl">Points Earned</div></div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h4>📊 Topic-wise Performance</h4>
+        <canvas id="bar-chart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>🎯 Skill Radar</h4>
+        <canvas id="radar-chart" height="200"></canvas>
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h4>✅ Strong Areas</h4>
+        <div>
+          <span class="skill-tag tag-strong">🟢 Arrays</span>
+          <span class="skill-tag tag-strong">🟢 Recursion</span>
+          <span class="skill-tag tag-strong">🟢 OOP Concepts</span>
+          <span class="skill-tag tag-strong">🟢 Linked Lists</span>
+          <span class="skill-tag tag-strong">🟢 Sorting</span>
+        </div>
+      </div>
+      <div class="analysis-card">
+        <h4>⚠️ Weak Areas</h4>
+        <div>
+          <span class="skill-tag tag-weak">🔴 Dynamic Programming</span>
+          <span class="skill-tag tag-weak">🔴 Graph Algorithms</span>
+          <span class="skill-tag tag-weak">🔴 Tree Traversals</span>
+        </div>
+        <p style="font-size:12px; color:var(--gray-600); margin-top:12px;">AI recommends focusing on DP patterns and BFS/DFS next.</p>
+      </div>
+    </div>
+
+    <div class="section-title">💼 AI Career Guidance</div>
+    <div class="career-grid">
+      <div class="career-card">
+        <div style="font-size:24px; margin-bottom:8px;">👨‍💻</div>
+        <div class="role">Software Engineer</div>
+        <div class="match">94% Match</div>
+      </div>
+      <div class="career-card">
+        <div style="font-size:24px; margin-bottom:8px;">🧮</div>
+        <div class="role">DSA Specialist</div>
+        <div class="match">88% Match</div>
+      </div>
+      <div class="career-card">
+        <div style="font-size:24px; margin-bottom:8px;">🔧</div>
+        <div class="role">Backend Developer</div>
+        <div class="match">82% Match</div>
+      </div>
+      <div class="career-card">
+        <div style="font-size:24px; margin-bottom:8px;">🤖</div>
+        <div class="role">AI Engineer</div>
+        <div class="match">71% Match</div>
+      </div>
+    </div>
+
+    <div class="cert-banner">
+      <div style="font-size:40px; margin-bottom:8px;">🏅</div>
+      <h3>Certificate Earned!</h3>
+      <p>You scored 80% — a downloadable PDF certificate with QR verification is ready.</p>
+      <button class="btn btn-primary" style="padding:10px 24px;">⬇ Download Certificate</button>
+    </div>
+
+    <div style="text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="showPage('quiz')">Retake Quiz ↺</button>
+      <button class="btn btn-outline" onclick="showPage('dashboard')">Back to Dashboard</button>
+      <button class="btn btn-outline" onclick="showPage('analytics')">View Analytics 📈</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ANALYTICS ═══════════════════ -->
+<div id="page-analytics" class="page">
+  <div class="analytics-container">
+    <div class="dash-header" style="margin-bottom:20px;">
+      <h2>📈 My Analytics</h2>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;">This Week</button>
+        <button class="btn btn-primary" style="font-size:11px; padding:5px 12px;">This Month</button>
+      </div>
+    </div>
+    <div class="an-grid">
+      <div class="an-card">
+        <div class="an-label">Quizzes Taken</div>
+        <div class="an-val">23</div>
+        <div class="an-change">↑ +5 from last month</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Avg Score</div>
+        <div class="an-val">74.8%</div>
+        <div class="an-change">↑ +6.2% improvement</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Total XP</div>
+        <div class="an-val">342</div>
+        <div class="an-change">↑ +89 this month</div>
+      </div>
+      <div class="an-card">
+        <div class="an-label">Global Rank</div>
+        <div class="an-val">#47</div>
+        <div class="an-change">↑ Up 12 positions</div>
+      </div>
+    </div>
+    <div class="charts-2col">
+      <div class="chart-card">
+        <h4>📅 Weekly Progress (Last 8 Weeks)</h4>
+        <canvas id="line-chart" height="160"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>🍕 Category Distribution</h4>
+        <canvas id="pie-chart" height="160"></canvas>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:20px;">
+      <h4>🏷️ Subject-wise Average Score</h4>
+      <canvas id="subject-bar" height="120"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ LEADERBOARD ═══════════════════ -->
+<div id="page-leaderboard" class="page">
+  <div class="lb-container">
+    <div class="dash-header" style="margin-bottom:20px;">
+      <h2>🏆 Leaderboard</h2>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab active">Global</button>
+      <button class="lb-tab">My College</button>
+      <button class="lb-tab">Friends</button>
+    </div>
+    <div class="lb-podium">
+      <div class="podium-item p2">
+        <div class="podium-avatar">RS</div>
+        <div class="podium-rank">🥈</div>
+        <div class="podium-name">Rahul S.</div>
+        <div class="podium-xp">892 XP</div>
+      </div>
+      <div class="podium-item p1">
+        <div class="podium-avatar">PK</div>
+        <div class="podium-rank">🥇</div>
+        <div class="podium-name">Priya K.</div>
+        <div class="podium-xp">1,204 XP</div>
+      </div>
+      <div class="podium-item p3">
+        <div class="podium-avatar">AM</div>
+        <div class="podium-rank">🥉</div>
+        <div class="podium-name">Arjun M.</div>
+        <div class="podium-xp">743 XP</div>
+      </div>
+    </div>
+    <div class="lb-list">
+      <div class="lb-row" style="background:var(--gray-50); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray-400);">
+        <div style="width:28px;">#</div><div style="width:36px;"></div><div style="flex:1;">Student</div><div>XP</div><div style="width:30px;"></div>
+      </div>
+      <div id="lb-rows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const categories = [
+  { name: 'Aptitude', icon: '🧮', diff: 'medium', total: 120, done: 65 },
+  { name: 'DSA', icon: '🌲', diff: 'hard', total: 180, done: 43 },
+  { name: 'Java', icon: '☕', diff: 'medium', total: 140, done: 80 },
+  { name: 'Python', icon: '🐍', diff: 'medium', total: 160, done: 92 },
+  { name: 'C Programming', icon: '⚙️', diff: 'hard', total: 110, done: 55 },
+  { name: 'C++', icon: '🔷', diff: 'hard', total: 115, done: 30 },
+  { name: 'JavaScript', icon: '🌐', diff: 'medium', total: 130, done: 70 },
+  { name: 'SQL', icon: '🗄️', diff: 'medium', total: 100, done: 40 },
+  { name: 'DBMS', icon: '📦', diff: 'hard', total: 105, done: 25 },
+  { name: 'OS', icon: '💻', diff: 'hard', total: 110, done: 15 },
+  { name: 'Networks', icon: '🔗', diff: 'hard', total: 100, done: 10 },
+  { name: 'OOP', icon: '🧩', diff: 'medium', total: 120, done: 68 },
+  { name: 'Web Dev', icon: '🕸️', diff: 'medium', total: 125, done: 50 },
+  { name: 'ML', icon: '🤖', diff: 'hard', total: 130, done: 20 },
+  { name: 'AI', icon: '🧠', diff: 'hard', total: 110, done: 12 },
+  { name: 'Cloud', icon: '☁️', diff: 'medium', total: 100, done: 35 },
+  { name: 'Cyber Sec', icon: '🔒', diff: 'hard', total: 100, done: 8 },
+];
+
+const questions = [
+  {
+    type: 'MCQ', typeClass: 'qtype-mcq', text: 'What is the time complexity of Binary Search on a sorted array of n elements?',
+    options: ['O(n)', 'O(log n)', 'O(n log n)', 'O(n²)'], answer: 1
+  },
+  {
+    type: 'Code Output', typeClass: 'qtype-code',
+    text: 'What is the output of the following Python code?',
+    code: `<span class="code-keyword">def</span> mystery(arr, n):\n    <span class="code-keyword">if</span> n == <span class="code-number">0</span>:\n        <span class="code-keyword">return</span>\n    mystery(arr, n-<span class="code-number">1</span>)\n    <span class="code-keyword">print</span>(arr[n-<span class="code-number">1</span>], end=<span class="code-string">" "</span>)\n\nmystery([<span class="code-number">3</span>,<span class="code-number">7</span>,<span class="code-number">1</span>,<span class="code-number">9</span>], <span class="code-number">4</span>)`,
+    options: ['3 7 1 9', '9 1 7 3', '1 3 7 9', 'Error'], answer: 0
+  },
+  {
+    type: 'Debug', typeClass: 'qtype-debug',
+    text: 'Find the bug in this code that reverses a linked list:',
+    code: `Node* reverse(Node* head) {\n    Node *prev = <span class="code-keyword">nullptr</span>;\n    Node *curr = head;\n    <span class="code-keyword">while</span> (curr != <span class="code-keyword">nullptr</span>) {\n        Node *next = curr->next;\n        curr->next = prev;\n        <span class="code-comment">// Bug is here</span>\n        curr = next;\n    }\n    <span class="code-keyword">return</span> curr; <span class="code-comment">// Should return prev</span>\n}`,
+    options: ['Line 4: condition wrong', 'Line 8: should be `prev = curr`', 'Line 10: should return `prev`', 'No bug exists'], answer: 2
+  },
+  {
+    type: 'MCQ', typeClass: 'qtype-mcq',
+    text: 'Which data structure uses LIFO (Last In First Out) principle?',
+    options: ['Queue', 'Stack', 'Heap', 'Linked List'], answer: 1
+  }
+];
+
+let currentQ = 0;
+let selectedOpt = null;
+let answered = 3;
+let timerVal = 102;
+let timerInterval;
+
+// ── RENDER CATEGORIES ──
+function renderCategories() {
+  const grid = document.getElementById('categories-grid');
+  if (!grid) return;
+  grid.innerHTML = categories.map(c => `
+    <div class="cat-card" onclick="showPage('quiz')">
+      <div class="cat-card-icon">${c.icon}</div>
+      <h4>${c.name}</h4>
+      <div class="cat-meta">${c.total} Questions</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${c.done}%"></div></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span class="cat-diff diff-${c.diff}">${c.diff.charAt(0).toUpperCase()+c.diff.slice(1)}</span>
+        <span style="font-size:11px; color:var(--gray-400); font-weight:500;">${c.done}% done</span>
+      </div>
+      <button class="start-quiz-btn">Start Quiz →</button>
+    </div>
+  `).join('');
+}
+
+// ── RENDER QUESTION ──
+function renderQuestion() {
+  const q = questions[currentQ % questions.length];
+  selectedOpt = null;
+  document.getElementById('q-num').textContent = currentQ + 4;
+  document.getElementById('quiz-prog').style.width = ((currentQ + 4) / 15 * 100) + '%';
+  document.getElementById('answered-count').textContent = answered;
+
+  let codeHTML = q.code ? `<div class="code-block">${q.code}</div>` : '';
+  const card = document.getElementById('question-card');
+  card.innerHTML = `
+    <div class="q-type-badge ${q.typeClass}">${q.type}</div>
+    <div class="question-text">${q.text}</div>
+    ${codeHTML}
+    <div class="options-list">
+      ${q.options.map((opt, i) => `
+        <div class="option" id="opt-${i}" onclick="selectOption(${i})">
+          <div class="option-letter">${String.fromCharCode(65+i)}</div>
+          ${opt}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function selectOption(i) {
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-'+i).classList.add('selected');
+  selectedOpt = i;
+}
+
+function submitAnswer() {
+  if (selectedOpt === null) { nextQuestion(); return; }
+  const q = questions[currentQ % questions.length];
+  document.querySelectorAll('.option').forEach((el, i) => {
+    if (i === q.answer) el.classList.add('correct');
+    else if (i === selectedOpt && i !== q.answer) el.classList.add('wrong');
+  });
+  answered = Math.min(answered + 1, 15);
+  setTimeout(nextQuestion, 1000);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= 11) { showPage('results'); return; }
+  renderQuestion();
+  resetTimer();
+}
+
+// ── TIMER ──
+function resetTimer() {
+  timerVal = 90 + Math.floor(Math.random() * 60);
+  updateTimerDisplay();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerVal--;
+    updateTimerDisplay();
+    const box = document.getElementById('timer-box');
+    if (timerVal <= 10) { box.className = 'timer-box danger'; }
+    else if (timerVal <= 20) { box.className = 'timer-box warning'; }
+    else { box.className = 'timer-box'; }
+    if (timerVal <= 0) { clearInterval(timerInterval); nextQuestion(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(timerVal/60)).padStart(2,'0');
+  const s = String(timerVal%60).padStart(2,'0');
+  const el = document.getElementById('timer');
+  if (el) el.textContent = m+':'+s;
+}
+
+// ── LEADERBOARD ──
+const lbData = [
+  { rank:4, init:'VN', name:'Vignesh N.', college:'VIT Vellore', xp: 690, badge:'🏅' },
+  { rank:5, init:'SK', name:'Sneha K.', college:'BITS Pilani', xp: 612, badge:'🌟' },
+  { rank:6, init:'DM', name:'Dhruv M.', college:'NIT Trichy', xp: 580, badge:'🏅' },
+  { rank:7, init:'AR', name:'Aditya R.', college:'PICT, Pune', xp: 342, badge:'🔥', me: true },
+  { rank:8, init:'TS', name:'Tanvi S.', college:'COEP, Pune', xp: 310, badge:'⭐' },
+  { rank:9, init:'KP', name:'Kiran P.', college:'IIT Bombay', xp: 290, badge:'🌟' },
+  { rank:10, init:'NJ', name:'Neha J.', college:'SIT, Pune', xp: 255, badge:'🏅' },
+];
+
+function renderLeaderboard() {
+  const el = document.getElementById('lb-rows');
+  if (!el) return;
+  el.innerHTML = lbData.map(r => `
+    <div class="lb-row ${r.me?'me':''}">
+      <div class="lb-rank">${r.rank}</div>
+      <div class="lb-av">${r.init}</div>
+      <div class="lb-info">
+        <div class="name">${r.name} ${r.me?'<span style="font-size:11px;color:var(--purple-600);font-weight:600;">(You)</span>':''}</div>
+        <div class="college">${r.college}</div>
+      </div>
+      <div class="lb-xp">${r.xp} XP</div>
+      <div class="lb-badge">${r.badge}</div>
+    </div>
+  `).join('');
+}
+
+// ── CHARTS ──
+let chartsBuilt = false;
+function buildCharts() {
+  if (chartsBuilt) return;
+  chartsBuilt = true;
+
+  const pink = '#E8547A', purple = '#7C3AED', light = '#D8B4FE';
+  const g_colors = [purple, pink, '#22C55E', '#F59E0B', '#3B82F6'];
+
+  // Bar chart (results)
+  const bc = document.getElementById('bar-chart');
+  if (bc) new Chart(bc, { type:'bar', data: {
+    labels: ['Arrays','Trees','DP','Graphs','OOP','Sorting'],
+    datasets: [{ data:[90,75,40,55,85,95], backgroundColor:[purple,purple,'#EF4444',pink,purple,purple], borderRadius:6, borderSkipped:false }]
+  }, options: { plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#F4F3F0'}},x:{ticks:{font:{size:10}},grid:{display:false}}}, responsive:true, maintainAspectRatio:true }});
+
+  // Radar chart (results)
+  const rc = document.getElementById('radar-chart');
+  if (rc) new Chart(rc, { type:'radar', data: {
+    labels: ['Speed','Accuracy','Logic','Debugging','Concepts'],
+    datasets: [{ data:[85,80,70,60,88], backgroundColor:'rgba(124,58,237,0.12)', borderColor:purple, pointBackgroundColor:purple, pointRadius:4 }]
+  }, options: { plugins:{legend:{display:false}}, scales:{r:{min:0,max:100,ticks:{font:{size:9},stepSize:25},grid:{color:'#F4F3F0'},pointLabels:{font:{size:10}}}}, responsive:true, maintainAspectRatio:true }});
+
+  // Line chart (analytics)
+  const lc = document.getElementById('line-chart');
+  if (lc) new Chart(lc, { type:'line', data: {
+    labels: ['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8'],
+    datasets: [{ label:'Avg Score %', data:[55,60,58,65,70,68,74,78], borderColor:purple, backgroundColor:'rgba(124,58,237,0.08)', fill:true, tension:0.4, pointBackgroundColor:purple, pointRadius:4 }]
+  }, options: { plugins:{legend:{display:false}}, scales:{y:{min:40,max:100,ticks:{font:{size:10}},grid:{color:'#F4F3F0'}},x:{ticks:{font:{size:10}},grid:{display:false}}}, responsive:true, maintainAspectRatio:true }});
+
+  // Pie chart (analytics)
+  const pc = document.getElementById('pie-chart');
+  if (pc) new Chart(pc, { type:'doughnut', data: {
+    labels:['DSA','Python','Java','SQL','Others'],
+    datasets:[{ data:[30,25,20,15,10], backgroundColor:[purple,pink,'#22C55E','#F59E0B','#3B82F6'], borderWidth:0, hoverOffset:6 }]
+  }, options: { plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:8}}}, responsive:true, maintainAspectRatio:true, cutout:'60%' }});
+
+  // Subject bar (analytics)
+  const sb = document.getElementById('subject-bar');
+  if (sb) new Chart(sb, { type:'bar', data: {
+    labels:['Python','Java','Aptitude','OOP','JS','SQL','C++','DSA'],
+    datasets:[{ data:[92,83,78,86,71,68,60,55], backgroundColor:[purple,purple,purple,purple,pink,pink,'#F59E0B','#3B82F6'], borderRadius:6, borderSkipped:false }]
+  }, options: { indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{min:0,max:100,ticks:{font:{size:10}},grid:{color:'#F4F3F0'}},y:{ticks:{font:{size:10}},grid:{display:false}}}, responsive:true, maintainAspectRatio:true }});
+}
+
+// ── PAGE ROUTER ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const tabs = ['landing','login','signup','dashboard','quiz','results','analytics','leaderboard'];
+  const idx = tabs.indexOf(name);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if (name === 'results' || name === 'analytics') setTimeout(buildCharts, 200);
+  if (name === 'leaderboard') renderLeaderboard();
+  if (name === 'quiz') { currentQ = 0; answered = 3; renderQuestion(); resetTimer(); }
+  if (name === 'signup') { renderSubjectPicker(); goStep(1); }
+  window.scrollTo(0,0);
+}
+
+// ── AUTH ──
+function togglePass(id, el) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; el.textContent = '🙈'; }
+  else { inp.type = 'password'; el.textContent = '👁'; }
+}
+
+function checkStrength(val) {
+  const fill = document.getElementById('strength-fill');
+  const text = document.getElementById('strength-text');
+  if (!fill) return;
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const levels = [
+    { w:'0%', color:'transparent', label:'' },
+    { w:'25%', color:'#EF4444', label:'Weak' },
+    { w:'50%', color:'#F59E0B', label:'Fair' },
+    { w:'75%', color:'#3B82F6', label:'Good' },
+    { w:'100%', color:'#22C55E', label:'Strong 💪' },
+  ];
+  const l = levels[score];
+  fill.style.width = l.w; fill.style.background = l.color;
+  text.textContent = l.label; text.style.color = l.color;
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if (!email || !pass) { err.textContent = '⚠️ Please fill in all fields.'; err.style.display='block'; return; }
+  if (!email.includes('@')) { err.textContent = '⚠️ Enter a valid email address.'; err.style.display='block'; return; }
+  err.style.display = 'none';
+  // Simulate login
+  showToast('✅ Welcome back, ' + email.split('@')[0] + '!');
+  setTimeout(() => showPage('dashboard'), 600);
+}
+
+function doSignup() {
+  showToast('🎉 Account created! Welcome to EngineerIQ!');
+  setTimeout(() => showPage('dashboard'), 700);
+}
+
+function socialLogin(provider) {
+  showToast('🔗 Redirecting to ' + provider + '...');
+  setTimeout(() => showPage('dashboard'), 900);
+}
+
+let currentStep = 1;
+function goStep(n) {
+  const err1 = document.getElementById('step1-error');
+  const err2 = document.getElementById('step2-error');
+  if (n === 2 && currentStep === 1) {
+    const name = document.getElementById('su-name')?.value.trim();
+    const email = document.getElementById('su-email')?.value.trim();
+    const pass = document.getElementById('su-pass')?.value;
+    if (!name || !email || !pass) { err1.textContent='⚠️ Please fill in all fields.'; err1.style.display='block'; return; }
+    if (!email.includes('@')) { err1.textContent='⚠️ Enter a valid email.'; err1.style.display='block'; return; }
+    if (pass.length < 8) { err1.textContent='⚠️ Password must be at least 8 characters.'; err1.style.display='block'; return; }
+    err1.style.display='none';
+  }
+  if (n === 3 && currentStep === 2) {
+    const college = document.getElementById('su-college')?.value.trim();
+    const branch = document.getElementById('su-branch')?.value;
+    if (!college || !branch) { err2.textContent='⚠️ Please fill in all fields.'; err2.style.display='block'; return; }
+    err2.style.display='none';
+  }
+  for (let i=1; i<=3; i++) {
+    const el = document.getElementById('signup-step-'+i);
+    if (el) el.style.display = i===n ? 'block' : 'none';
+  }
+  for (let i=1; i<=3; i++) {
+    const dot = document.getElementById('step-dot-'+i);
+    if (!dot) continue;
+    dot.classList.remove('active','done');
+    if (i < n) dot.classList.add('done'), dot.textContent='✓';
+    else if (i === n) dot.classList.add('active'), dot.textContent=String(i);
+    else dot.textContent=String(i);
+    if (i < 3) {
+      const line = document.getElementById('step-line-'+i);
+      if (line) { line.classList.toggle('done', i < n); }
+    }
+  }
+  currentStep = n;
+}
+
+const subjectList = ['Python','DSA','Java','C++','JavaScript','SQL','DBMS','OS','Networks','OOP','Web Dev','ML','AI','Cloud'];
+const selectedSubjects = new Set(['Python','DSA']);
+
+function renderSubjectPicker() {
+  const el = document.getElementById('subject-picker');
+  if (!el) return;
+  el.innerHTML = subjectList.map(s => `
+    <button onclick="toggleSubject('${s}', this)"
+      style="padding:6px 14px; border-radius:20px; border:1.5px solid ${selectedSubjects.has(s)?'var(--purple-600)':'var(--gray-200)'}; background:${selectedSubjects.has(s)?'var(--purple-50)':'white'}; color:${selectedSubjects.has(s)?'var(--purple-600)':'var(--gray-600)'}; font-size:12px; font-weight:500; cursor:pointer; transition:all 0.15s;">
+      ${s}
+    </button>`).join('');
+}
+
+function toggleSubject(name, btn) {
+  if (selectedSubjects.has(name)) { selectedSubjects.delete(name); btn.style.borderColor='var(--gray-200)'; btn.style.background='white'; btn.style.color='var(--gray-600)'; }
+  else { selectedSubjects.add(name); btn.style.borderColor='var(--purple-600)'; btn.style.background='var(--purple-50)'; btn.style.color='var(--purple-600)'; }
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1A1816;color:white;padding:12px 24px;border-radius:24px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.18);white-space:nowrap;';
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.4s'; setTimeout(() => t.remove(), 400); }, 2200);
+}
+
+// ── INIT ──
+renderCategories();
+</script>
+</body>
+</html>
